@@ -8,11 +8,16 @@ It will provide
 ## API info
 ```bash
 $ curl -L https://script.googleusercontent.com/...
-[{
+{
   "timestamp": 123456,
   "id": "xxxx",
   "replyToken": "xxxxxx"
-}]
+}
+```
+or when not found
+```bash
+$ curl -L https://script.googleusercontent.com/...
+null
 ```
 
 ## How to deploy
