@@ -13,7 +13,7 @@ export interface ReplyToken {
   replyToken: string
 }
 
-export function get_tokens(id: string): ReplyToken[] {
+export function get_token(id: string): ReplyToken | undefined {
   update_tokens()
 
   const sheet = SpreadsheetApp.openById(REPLYTOKEN_SHEET_ID).getSheetByName(REPLYTOKEN_SHEET_NAME)!;
@@ -21,18 +21,29 @@ export function get_tokens(id: string): ReplyToken[] {
 
   const range = sheet.getRange(1, 1, lastRow, 3);
 
-  return range.getValues().filter(v => {
+  const matchedValues = range.getValues().find(v => {
     const [timestamp, vid, replyToken] = v;
 
-    return id == vid
-  }).map(v => {
-    const [timestamp, id, replyToken] = v;
-    return {
-      timestamp,
-      id,
-      replyToken
+    if (id == vid) { // delete returning replyToken
+      range.setValues(range.getValues().map(v1 => {
+        const [v1timestamp, v1id, v1replyToken] = v1;
+
+        if (timestamp == v1timestamp && vid == v1id && replyToken == v1replyToken) {
+          return [null, null, null]
+        }
+
+        return v1
+      }))
     }
-  })
+
+    return id == vid
+  });
+
+  return matchedValues ? {
+    timestamp: matchedValues[0],
+    id: matchedValues[1],
+    replyToken: matchedValues[2]
+  } : undefined
 }
 
 export function update_tokens() {
